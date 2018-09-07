@@ -22,6 +22,86 @@ public static void selection_sort(int[] arr) {
 
 ```
 
+## 插入排序
+
+插入排序（英语：Insertion Sort）是一种简单直观的排序算法。它的工作原理是通过构建有序序列，对于未排序数据，在已排序序列中从后向前扫描，找到相应位置并插入。插入排序在实现上，通常采用in-place排序（即只需用到
+O(1)
+{\displaystyle O(1)}的额外空间的排序），因而在从后向前扫描过程中，需要反复把已排序元素逐步向后挪位，为最新元素提供插入空间。
+
+```java
+public void insertionSort(int[] array) {
+        for (int i = 1; i < array.length; i++) {
+            int key = array[i];
+            int j = i - 1;
+            while (j >= 0 && array[j] > key) {
+                array[j + 1] = array[j];
+                j--;
+            }
+        array[j + 1] = key;
+        }
+    }
+```
+
+## 冒泡排序
+
+冒泡排序
+Bubble sort animation.gif
+使用冒泡排序为一列数字进行排序的过程
+分类        排序算法
+数据结构        数组
+最坏时间复杂度  {\displaystyle O(n^{2})} O(n^{2})
+最优时间复杂度  {\displaystyle O(n)} O(n)
+平均时间复杂度  {\displaystyle O(n^{2})} O(n^{2})
+最坏空间复杂度  总共 {\displaystyle O(n)} O(n)，需要辅助空间 {\displaystyle O(1)} O(1)
+
+冒泡排序
+冒泡排序（英语：Bubble Sort）是一种简单的排序算法。它重复地走访过要排序的数列，一次比较两个元素，如果他们的顺序错误就把他们交换过来。走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。这个算法的名字由来是因为越小的元素会经由交换慢慢“浮”到数列的顶端。
+
+冒泡排序对 {\displaystyle n} n个项目需要O( {\displaystyle n^{2}} n^{2})的比较次数，且可以原地排序。尽管这个算法是最简单了解和实现的排序算法之一，但它对于包含大量的元素的数列排序是很没有效率的。
+
+冒泡排序是与插入排序拥有相等的运行时间，但是两种算法在需要的交换次数却很大地不同。在最坏的情况，冒泡排序需要 {\displaystyle O(n^{2})} O(n^{2})次交换，而插入排序只要最多 {\displaystyle O(n)} O(n)交换。冒泡排序的实现（类似下面）通常会对已经排序好的数列拙劣地运行（ {\displaystyle O(n^{2})} O(n^{2})），而插入排序在这个例子只需要 {\displaystyle O(n)} O(n)个运算。因此很多现代的算法教科书避免使用冒泡排序，而用插入排序取代之。冒泡排序如果能在内部循环第一次运行时，使用一个旗标来表示有无需要交换的可能，也可以把最优情况下的复杂度降低到 {\displaystyle O(n)} O(n)。在这个情况，已经排序好的数列就无交换的需要。若在每次走访数列时，把走访顺序反过来，也可以稍微地改进效率。有时候称为鸡尾酒排序，因为算法会从数列的一端到另一端之间穿梭往返。
+
+冒泡排序算法的运作如下：
+
+比较相邻的元素。如果第一个比第二个大，就交换他们两个。
+对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。这步做完后，最后的元素会是最大的数。
+针对所有的元素重复以上的步骤，除了最后一个。
+持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。
+
+```java
+public static void bubbleSort(int[] arr) {
+    int i, temp, len = arr.length;
+    boolean changed;
+    do {
+      changed = false;
+      len-=1;
+      for (i = 0; i < len; i++) {
+        if (arr[i] > arr[i + 1]) {
+          temp = arr[i];
+          arr[i] = arr[i + 1];
+          arr[i + 1] = temp;
+          changed = true;
+        }
+      }
+    } while (changed);
+  }
+  
+  public static void bubbleSort2(Comparable[] arr) {
+        int n = arr.length;
+        int newn;
+        do {
+            newn = 0;
+            for (int i = 1; i < n; i++)
+                if (arr[i - 1].compareTo(arr[i]) > 0) {
+                    swap(arr, i - 1, i);
+                    newn = i;
+                }
+            n = newn;
+        } while (newn > 0);
+  }
+
+```
+
 ## 归并排序
 
 归并排序（英语：Merge sort，或mergesort），是创建在归并操作上的一种有效的排序算法，效率为 O(n\log n) O(n\log n)（大O符号）。1945年由约翰·冯·诺伊曼首次提出。该算法是采用分治法（Divide and Conquer）的一个非常典型的应用，且各层分治递归可以同时进行。
@@ -306,4 +386,16 @@ public class shellSort {
 ```
 
 说明：希尔排序内部循环中，上面代码不是一次性将步长相同的元素一起进行插入排序，而是将i之前的步长相同的先排序，然后等到i自增到一个步长后，在进行这个步长的的排序，如此循环。
+
+## 桶排序
+
+桶排序（Bucket sort）或所谓的箱排序，是一个排序算法，工作的原理是将数组分到有限数量的桶里。每个桶再个别排序（有可能再使用别的排序算法或是以递归方式继续使用桶排序进行排序）。桶排序是鸽巢排序的一种归纳结果。当要被排序的数组内的数值是均匀分配的时候，桶排序使用线性时间（ {\displaystyle \Theta (n)} {\displaystyle \Theta (n)}（大O符号））。但桶排序并不是比较排序，他不受到 {\displaystyle O(n\log n)} {\displaystyle O(n\log n)}下限的影响
+
+桶排序以下列程序进行：
+
+1. 设置一个定量的数组当作空桶子 。
+2. 寻访序列，并且把项目一个一个放到对应的桶子去。
+3. 对每个不是空的桶子进行排序。
+4. 从不是空的桶子里把项目再放回原来的序列中。
+
 

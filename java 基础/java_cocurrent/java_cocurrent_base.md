@@ -51,6 +51,7 @@ digraph g {
     - 可重入锁 ReentrantLock() 锁lock, 解锁unlock
     - 条件变量 Condition,await,signalall,signal
     - synchronized,wait(xxx),notify(),notifyall()
+    - trylock trylock(long time, TimeUnit unit) lockInterruptibly() await(long time, TimeUnit unit) awaitUninterruptibly()
 
 问题1：等待条件线程被唤醒并重新获取锁后 从程序那个位置开始执行？
 从wait返回，此时条件可能满足也可能不满足，（比如转账操作，用户转入后就会调用唤醒等待该条件的所有线程，但如果转入的钱比刚刚唤醒的转出线程所需的钱少时就是不满足条件情况）所以有必要重新检查该条件 范式 while（检查条件不满足）{等待条件}
@@ -65,3 +66,5 @@ digraph g {
 问题4：那么使用lock和condition还是使用synchronized关键字呢？
   最好两个都不使用，使用juc中的线程安全机制，如果真的有需要优先使用synchronized，最后考虑lock，这样减少出错的概率。
   
+问题5：trylock和lock的区别，trylcok非阻塞枷锁（没有获取到锁会直接返回不会阻塞进入等待队列）lock在获取不到锁的时候回进入阻塞，当阻塞进程被中断那么中断线程在获取到锁之前会一直阻塞，如果死锁则lock无法结束（所以lock无法被中断）
+trylock trylock(long time, TimeUnit unit) 如果未获取到锁会阻塞到指定时间然后返回，如果在阻塞期间被中断会抛出异常，（结束程序）（trylock是可被中断的）。

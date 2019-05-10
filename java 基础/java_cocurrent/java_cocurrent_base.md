@@ -1,4 +1,37 @@
-## java 并发基础
+## java 并发基础 
+### 学习java并发 
+1. 理论模型管程
+2. 需要解决的问题 分工，同步，互斥（可见性，有序性，原子操作，内存模型用例解决可见性和有序性）
+3. 将学习的知识向上面归类
+### 并发bug产生的源头
+1. 起源由于cpu，内存，io之前的读写速度差异很大，为提高各个模块性能，引入cpu缓存平衡cpu和内存的访问速度差，操作分时复用平衡了cpu与io的速度差，编译器优化程序指令的顺序使其更加合理使用缓存
+2. 天下没有免费的午餐，上面的机制提高了性能的同时也带来了很多bug，cpu缓存带来可见性问题，线程分时复用导致原子性问题，编译器优化导致有序性问题。
+3. 如何解决这些问题-内存模型（内存模型规范了jvm按需禁用缓存和编译优化）
+4. volatile （直接写入内存，直接从内存中读取，禁用cpu缓存）
+```java 
+// 以下代码来源于【参考 1】
+class VolatileExample {
+  int x = 0;
+  volatile boolean v = false;
+  public void writer() {
+    x = 42;
+    v = true;
+  }
+  public void reader() {
+    if (v == true) {
+      // 这里 x 会是多少呢？
+    }
+  }
+}
+```
+####  java内存模型之happens before规则
+1. 程序顺序规则 (在一个线程中，按照顺序，前面的操作happens before 后面的操作)
+2. volatile变量操作（对volatile类型变量的写操作happens before 后续对该变量的读操作）
+3. 传递性规则 (A happens before B， B happens before C 那么 A happens before C)
+- 所以根据这规则1 线程一写操作中x=42，happens before v=ture ，根据规则2 线程一的true happens before 线程二读操作 v==ture 再根据规则3 所以x=42对于线程二读操作中的x是可见的。
+4. 管程中的锁的规则(解锁操作happens before 对这个锁的加锁操作)
+5. 线程的start()规则(主线程A调start()启动子线程B,start() happens before B)
+6. 线程的join()规则(主线程A join 子线程B，B)
 #### 线程
 
 1. 通用线程生命周--线程状态
@@ -51,7 +84,9 @@ digraph g {
     - 可重入锁 ReentrantLock() 锁lock, 解锁unlock
     - 条件变量 Condition,await,signalall,signal
     - synchronized,wait(xxx),notify(),notifyall()
-    - trylock trylock(long time, TimeUnit unit) lockInterruptibly() await(long time, TimeUnit unit) awaitUninterruptibly()
+    - trylock trylock(long time, TimeUnit unit) lockInterruptibly() await(long time, TimeUnit unit) awaitUninterruptibly() 
+    - 读写锁private ReentrantReadWriteLock rwl = new ReentrantReadWriteLock() private Lock readLock = rwl . readLock() ;private Lock writeLock = rwl .writeLock();
+    - stop和resume被过期的方法
 
 问题1：等待条件线程被唤醒并重新获取锁后 从程序那个位置开始执行？
 从wait返回，此时条件可能满足也可能不满足，（比如转账操作，用户转入后就会调用唤醒等待该条件的所有线程，但如果转入的钱比刚刚唤醒的转出线程所需的钱少时就是不满足条件情况）所以有必要重新检查该条件 范式 while（检查条件不满足）{等待条件}
@@ -68,3 +103,5 @@ digraph g {
   
 问题5：trylock和lock的区别，trylcok非阻塞枷锁（没有获取到锁会直接返回不会阻塞进入等待队列）lock在获取不到锁的时候回进入阻塞，当阻塞进程被中断那么中断线程在获取到锁之前会一直阻塞，如果死锁则lock无法结束（所以lock无法被中断）
 trylock trylock(long time, TimeUnit unit) 如果未获取到锁会阻塞到指定时间然后返回，如果在阻塞期间被中断会抛出异常，（结束程序）（trylock是可被中断的）。
+中断线程主线程拿到要中断线程的的对象调用中断方法thread.interrupt();
+问题6 stop和resume方法被淘汰的原因，stop在程序任何时段调用会立即终止所有未结束的方法（比如转账a账户已扣款b还未入账b账户之间调用stop就会造成影响）resume 的问题是 当挂起的线程持有一把锁，而这把锁resume时候也要获取那么则造成了死锁。

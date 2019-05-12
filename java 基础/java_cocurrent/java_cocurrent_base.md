@@ -8,7 +8,8 @@
 2. 天下没有免费的午餐，上面的机制提高了性能的同时也带来了很多bug，cpu缓存带来可见性问题，线程分时复用导致原子性问题，编译器优化导致有序性问题。
 3. 如何解决这些问题-内存模型（内存模型规范了jvm按需禁用缓存和编译优化）
 4. volatile （直接写入内存，直接从内存中读取，禁用cpu缓存）
-```java 
+
+```java
 // 以下代码来源于【参考 1】
 class VolatileExample {
   int x = 0;
@@ -24,14 +25,23 @@ class VolatileExample {
   }
 }
 ```
-####  java内存模型之happens before规则
+
+#### java内存模型之happens before规则(解决可见性和有序性)
+
 1. 程序顺序规则 (在一个线程中，按照顺序，前面的操作happens before 后面的操作)
 2. volatile变量操作（对volatile类型变量的写操作happens before 后续对该变量的读操作）
 3. 传递性规则 (A happens before B， B happens before C 那么 A happens before C)
+
 - 所以根据这规则1 线程一写操作中x=42，happens before v=ture ，根据规则2 线程一的true happens before 线程二读操作 v==ture 再根据规则3 所以x=42对于线程二读操作中的x是可见的。
-4. 管程中的锁的规则(解锁操作happens before 对这个锁的加锁操作)
-5. 线程的start()规则(主线程A调start()启动子线程B,start() happens before B)
-6. 线程的join()规则(主线程A join 子线程B，B)
+
+1. 管程中的锁的规则(解锁操作happens before 对这个锁的加锁操作)
+2. 线程的start()规则(主线程A调start()启动子线程B,start() happens before B)
+3. 线程的join()规则(主线程A join 子线程B，B happens before join)
+
+#### 互斥锁(解决原子性问题)
+
+1. 重点注意锁和要保护资源的对应关系，自己的锁保护自己的资源，可以类比现实生活中的收门票，锁和要保护资源的关系是一对多关系
+
 #### 线程
 
 1. 通用线程生命周--线程状态

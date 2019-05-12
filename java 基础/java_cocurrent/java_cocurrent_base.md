@@ -61,7 +61,6 @@ class VolatileExample {
    4. 循环等待，T1等待T2占有的资源，T2等待T1占有的资源。
    5. 破坏234条就能避免死锁。2，一次性获取所有资源，3，占用部分资源的线程进一步申请资源，申请不到的时候释放锁占有的其他资源。4，顺序获取资源。
 
-
 #### 通知等待机制
 
 1. 对标管程模型，理解synchronized 的 wait notify,notifyall 方法。sleep和wait的区别。
